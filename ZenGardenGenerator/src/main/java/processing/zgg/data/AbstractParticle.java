@@ -24,7 +24,7 @@ public abstract class AbstractParticle {
     private PVector acceleration;
     
     private float radius;
-    private int personalSpaceRadiusFactor;
+    private float personalSpaceRadiusFactor;
     private boolean dead;
     private int speedUpFactor;
 
@@ -56,7 +56,7 @@ public abstract class AbstractParticle {
         final int curSpeedUpFactor = Math.max(this.speedUpFactor, 1);
         final float curMaxVelocityMag = getMaxVelocityMagnitude() * curSpeedUpFactor;
         final float curMaxForceMag = getMaxForceMagnitude() * curSpeedUpFactor;
-        final int curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
+        final float curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
         final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
         
         final PVector desired = PVector.sub(target, this.position);
@@ -75,6 +75,10 @@ public abstract class AbstractParticle {
     
     public void seek(@NonNull final AbstractParticle particle) {
         seek(particle.getPosition());
+    }
+    
+    public void unseek() {
+        seek(this);
     }
     
     public float getEffectiveRadius() {
