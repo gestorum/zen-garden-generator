@@ -75,7 +75,7 @@ public class RSSSketch extends ZenGardenSketch {
 
         initSoundGenerator();
 
-        smooth(8);
+        size(INITIAL_MAP_WIDTH, INITIAL_MAP_HEIGHT);
     }
 
     @Override
@@ -84,7 +84,6 @@ public class RSSSketch extends ZenGardenSketch {
         
         frameRate(FRAME_RATE);
 
-        surface.setSize(INITIAL_MAP_WIDTH, INITIAL_MAP_HEIGHT);
         surface.setResizable(true);
         
         windowResized();

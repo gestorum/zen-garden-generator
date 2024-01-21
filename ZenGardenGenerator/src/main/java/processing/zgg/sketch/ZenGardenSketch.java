@@ -22,7 +22,7 @@ public abstract class ZenGardenSketch extends PApplet {
     private static final String FRAME_RECORDING_FILENAME = "output/recording/%s-######.png";
     private static final String WAVE_RECORDING_FILENAME = "output/recording/audio/%s-######.wav";
     private static final String FRAME_CAPTURE_FILENAME = "output/capture/%s-%s.png";
-
+    
     private Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
     private Color frameCaptureBackgroundColor = DEFAULT_FRAME_CAPTURE_BACKGROUND_COLOR;
 

@@ -116,7 +116,7 @@ public class RideableShareParticleSystem
         rideableParticles.stream().forEach(p -> {
             final StationParticle stationParticle = getStationParticleById(randomizeStationId(null));
             p.setStationId(stationParticle.getId());
-            p.seek(stationParticle.getPosition());
+            p.seek(stationParticle);
         });
     }
     
@@ -146,7 +146,7 @@ public class RideableShareParticleSystem
                     stationParticleByIdMap.get(p.getStationId()) : null;
             
             if (stationParticle != null) {
-                p.seek(stationParticle.getPosition());
+                p.seek(stationParticle);
                 p.setSpeedUpFactor(getSpeedUpFactor());
             
                 final Optional<RideableParticle> detectedParticle = rideableParticles

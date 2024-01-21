@@ -11,8 +11,9 @@ import processing.core.PVector;
 import processing.zgg.utils.MotionUtils;
 
 /**
- *
+ * 
  * @author gestorum
+ * @see <a href="https://natureofcode.com/autonomous-agents">The Nature of Code - Autonomous Agents</a>
  */
 @Data
 @SuperBuilder
@@ -72,15 +73,17 @@ public abstract class AbstractParticle {
         this.applyForce(steer);
     }
     
-    public boolean isCollisionDetected(@NonNull final PVector target) {
-        final int curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
-        final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
-        final PVector diff = PVector.sub(target, this.position);
-        return diff.mag() < curRadius;
+    public void seek(@NonNull final AbstractParticle particle) {
+        seek(particle.getPosition());
+    }
+    
+    public float getEffectiveRadius() {
+        return this.radius * Math.max(this.personalSpaceRadiusFactor, 1);
     }
     
     public boolean isCollisionDetected(@NonNull final AbstractParticle particle) {
-        return isCollisionDetected(particle.getPosition());
+        return PVector.dist(this.position, particle.getPosition())
+                < this.getEffectiveRadius() + particle.getEffectiveRadius();
     }
     
     public abstract float getMaxVelocityMagnitude();
