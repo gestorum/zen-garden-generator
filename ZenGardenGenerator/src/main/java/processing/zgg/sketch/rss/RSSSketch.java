@@ -52,6 +52,7 @@ public class RSSSketch extends ZenGardenSketch {
     private boolean rideableTrailEnabled = true;
     private boolean updateRideables = true;
     private boolean displayRideables = true;
+    private boolean displayStations = true;
     
     private final Map<String, List<RideableShareSystemStationEvent>> stationEventsByStationId = new HashMap<>();
     private final Map<String, List<StationAnimation>> stationAnimationListByStationId = new HashMap<>();
@@ -114,15 +115,18 @@ public class RSSSketch extends ZenGardenSketch {
             }
         }
         
-        switch (Character.toLowerCase(key)) {
-            case 't' ->
+        switch (key) {
+            case 't', 'T' ->
                 rideableTrailEnabled = !rideableTrailEnabled;
 
-            case 'u' ->
+            case 'u', 'U' ->
                 updateRideables = !updateRideables;
 
             case 'd' ->
                 displayRideables = !displayRideables;
+
+            case 'D' ->
+                displayStations = !displayStations;
         }
     }
 
@@ -153,7 +157,7 @@ public class RSSSketch extends ZenGardenSketch {
     }
     
     private void drawParticle(@NonNull final Particle particle) {
-        if (particle.getClass().isAssignableFrom(StationParticle.class)) {
+        if (displayStations && particle.getClass().isAssignableFrom(StationParticle.class)) {
             drawStation((StationParticle)particle);
         } else if (displayRideables && particle.getClass().isAssignableFrom(RideableParticle.class)) {
             drawRideable((RideableParticle)particle);
