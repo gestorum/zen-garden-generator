@@ -39,8 +39,8 @@ public class RideableShareParticleSystem
     private static final float RIDEABLE_WIDTH_RATIO = 0.002f;
     private static final int RIDEABLE_SLOW_DOWN_RADIUS_FACTOR = 20;
     
-    private static final int RIDEABLE_MIN_SPEED_KM_PER_HOUR = 15;
-    private static final int RIDEABLE_MAX_SPEED_KM_PER_HOUR = 40;
+    private static final int RIDEABLE_MIN_VELOCITY = 1;
+    private static final int RIDEABLE_MAX_VELOCITY = 10;
     
     private final Map<String, StationParticle> stationParticleByIdMap = new HashMap<>();
     private final List<StationParticle> stationParticles = new ArrayList<>();
@@ -104,7 +104,7 @@ public class RideableShareParticleSystem
                 final RideableParticle rideableParticule = RideableParticle.builder()
                         .id(UUID.randomUUID().toString())
                         .position(randomizeRideablePosition())
-                        .velocity(randomizeRideableVelocity())
+                        .velocity(randomizeRideableVelocity(null))
                         .acceleration(new PVector())
                         .radius(rideableWidth)
                         .slowDownRadiusFactor(RIDEABLE_SLOW_DOWN_RADIUS_FACTOR)
@@ -148,18 +148,15 @@ public class RideableShareParticleSystem
             if (stationParticle != null) {
                 p.seek(stationParticle.getPosition());
                 p.setSpeedUpFactor(getSpeedUpFactor());
-                p.update();
-            }
-        });
-        
-        rideableParticles.forEach(p1 -> {
-            final Optional<RideableParticle> detectedParticle = rideableParticles
-                    .stream().filter(p2 -> p2.isCollisionDetected(p1))
-                    .findFirst();
+            
+                final Optional<RideableParticle> detectedParticle = rideableParticles
+                        .stream().filter(p::isCollisionDetected).findFirst();
 
-            if (detectedParticle.isPresent()) {
-                p1.applyForce(PVector.mult(detectedParticle.get().getVelocity(), -1));
-                p1.update();
+                if (detectedParticle.isPresent()) {
+                    p.applyForce(detectedParticle.get().getVelocity());
+                }
+                
+                p.update();
             }
         });
     }
@@ -181,12 +178,19 @@ public class RideableShareParticleSystem
         return new PVector(x, y);
     }
     
-    public PVector randomizeRideableVelocity() {
+    public PVector randomizeRideableVelocity(final PVector currentVelocity) {
+        final int min;
+        final int max;
+        
+        if (currentVelocity != null) {
+            min = Math.max((int)currentVelocity.x - 1, RIDEABLE_MIN_VELOCITY);
+            max = Math.min((int)currentVelocity.x + 1, RIDEABLE_MAX_VELOCITY);
+        } else {
+            min = RIDEABLE_MIN_VELOCITY;
+            max = RIDEABLE_MAX_VELOCITY;
+        }
+
         final Random random = new Random();
-        
-        int min = RIDEABLE_MIN_SPEED_KM_PER_HOUR;
-        int max = RIDEABLE_MAX_SPEED_KM_PER_HOUR;
-        
         int velocity = max > min ? random.ints(min, max)
                 .findFirst().getAsInt() : min;
         
