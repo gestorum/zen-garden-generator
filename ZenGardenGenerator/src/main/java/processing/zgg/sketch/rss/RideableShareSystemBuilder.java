@@ -8,7 +8,7 @@ import java.io.IOException;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public interface RideableShareSystemBuilder {
     

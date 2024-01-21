@@ -12,11 +12,11 @@ import processing.zgg.utils.MotionUtils;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 @Data
 @SuperBuilder
-public abstract class AbstractParticle implements Particle {
+public abstract class AbstractParticle {
     
     private PVector position;
     private PVector velocity;
@@ -25,9 +25,8 @@ public abstract class AbstractParticle implements Particle {
     private float radius;
     private boolean dead;
     private int speedUpFactor;
-    private int slowDownRadiusFactor;
+    private int personalSpaceRadiusFactor;
 
-    @Override
     public void update() {
         if (this.velocity == null || this.position == null || this.acceleration == null) {
             throw new RuntimeException("Cannot update particle because velocity, position or acceleration has not been defined!");
@@ -40,7 +39,6 @@ public abstract class AbstractParticle implements Particle {
         this.acceleration.mult(0);
     }
 
-    @Override
     public void applyForce(@NonNull final PVector force) {
         if (this.acceleration == null) {
             throw new RuntimeException("Cannot apply force because acceleration has not been defined!");
@@ -49,7 +47,6 @@ public abstract class AbstractParticle implements Particle {
         this.acceleration.add(force);
     }
     
-    @Override
     public void seek(@NonNull final PVector target) {
         if (this.position == null || this.velocity == null) {
             throw new RuntimeException("Cannot seek target because either position or velocity has not been defined!");
@@ -58,8 +55,8 @@ public abstract class AbstractParticle implements Particle {
         final int curSpeedUpFactor = Math.max(this.speedUpFactor, 1);
         final float curMaxSpeed = getMaxSpeed() * curSpeedUpFactor;
         final float curMaxForce = getMaxForce() * curSpeedUpFactor;
-        final int curSlowDownRadiusFactor = Math.max(this.slowDownRadiusFactor, 1);
-        final float curRadius = this.radius * curSlowDownRadiusFactor;
+        final int curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
+        final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
         
         final PVector desired = PVector.sub(target, this.position);
         if (desired.mag() < curRadius) {
@@ -75,16 +72,17 @@ public abstract class AbstractParticle implements Particle {
         this.applyForce(steer);
     }
     
-    @Override
     public boolean isCollisionDetected(@NonNull final PVector target) {
-        final int curSlowDownRadiusFactor = Math.max(this.slowDownRadiusFactor, 1);
-        final float curRadius = this.radius * curSlowDownRadiusFactor;
+        final int curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
+        final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
         final PVector diff = PVector.sub(target, this.position);
         return diff.mag() < curRadius;
     }
     
-    @Override
-    public boolean isCollisionDetected(@NonNull final Particle particle) {
+    public boolean isCollisionDetected(@NonNull final AbstractParticle particle) {
         return isCollisionDetected(particle.getPosition());
     }
+    
+    public abstract float getMaxSpeed();
+    public abstract float getMaxForce();
 }

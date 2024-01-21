@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     
@@ -37,7 +37,7 @@ public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
         this.speedUpFactor = factor;
     }
     
-    protected void purgeDeadParticles(@NonNull final Collection<? extends Particle> particles) {
-        particles.removeAll(particles.stream().filter(Particle::isDead).toList());
+    protected void purgeDeadParticles(@NonNull final Collection<? extends AbstractParticle> particles) {
+        particles.removeAll(particles.stream().filter(AbstractParticle::isDead).toList());
     }
 }

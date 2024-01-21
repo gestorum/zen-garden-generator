@@ -10,7 +10,7 @@ import lombok.NonNull;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 @Data
 public class OperationArea {

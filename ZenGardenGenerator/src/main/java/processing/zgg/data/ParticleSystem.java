@@ -8,14 +8,14 @@ import java.util.List;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public interface ParticleSystem<T> {
     
     void init(int width, int height);
     void update();
     
-    List<Particle> getParticles();
+    List<AbstractParticle> getParticles();
     
     int getSpeedUpFactor();
     void setSpeedUpFactor(int factor);

@@ -12,7 +12,7 @@ import processing.zgg.data.AbstractParticle;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

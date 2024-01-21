@@ -12,7 +12,7 @@ import processing.zgg.utils.ResourceUtils;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class ZenGardenGenerator {
 

@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import processing.core.PVector;
+import processing.zgg.data.AbstractParticle;
 import processing.zgg.data.AbstractParticleSystem;
-import processing.zgg.data.Particle;
 import processing.zgg.sketch.rss.data.OperationArea;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
@@ -27,7 +27,7 @@ import processing.zgg.utils.CoordinatesConverter;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class RideableShareParticleSystem
         extends AbstractParticleSystem<RideableShareSystem> {
@@ -37,7 +37,7 @@ public class RideableShareParticleSystem
     
     private static final int RIDEABLE_MIN_WIDTH = 1;
     private static final float RIDEABLE_WIDTH_RATIO = 0.002f;
-    private static final int RIDEABLE_SLOW_DOWN_RADIUS_FACTOR = 20;
+    private static final int RIDEABLE_PERSONAL_SPACE_RADIUS_FACTOR = 20;
     
     private static final int RIDEABLE_MIN_VELOCITY = 1;
     private static final int RIDEABLE_MAX_VELOCITY = 10;
@@ -107,7 +107,7 @@ public class RideableShareParticleSystem
                         .velocity(randomizeRideableVelocity(null))
                         .acceleration(new PVector())
                         .radius(rideableWidth)
-                        .slowDownRadiusFactor(RIDEABLE_SLOW_DOWN_RADIUS_FACTOR)
+                        .personalSpaceRadiusFactor(RIDEABLE_PERSONAL_SPACE_RADIUS_FACTOR)
                         .build();
                 rideableParticles.add(rideableParticule);
             }
@@ -162,7 +162,7 @@ public class RideableShareParticleSystem
     }
     
     @Override
-    public List<Particle> getParticles() {
+    public List<AbstractParticle> getParticles() {
         return Stream.of(rideableParticles, stationParticles)
                 .flatMap(Collection::stream).collect(Collectors.toList());
     }

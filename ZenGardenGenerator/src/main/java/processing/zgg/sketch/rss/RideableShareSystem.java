@@ -20,7 +20,7 @@ import processing.zgg.sketch.rss.gbfs.data.GbfsStationStatus;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class RideableShareSystem {
     

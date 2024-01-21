@@ -11,7 +11,7 @@ import processing.zgg.sketch.rss.gbfs.data.GbfsStationInfo;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class GbfsStationInfoMapper implements GbfsObjectMapper<GbfsStationInfo> {
 

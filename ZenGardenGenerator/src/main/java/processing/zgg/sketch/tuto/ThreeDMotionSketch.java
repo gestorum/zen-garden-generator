@@ -8,7 +8,7 @@ import processing.zgg.sketch.ZenGardenSketch;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class ThreeDMotionSketch extends ZenGardenSketch {
 

@@ -12,7 +12,7 @@ import processing.zgg.audio.ZenGardenSoundGenerator;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public abstract class ZenGardenSketch extends PApplet {
 

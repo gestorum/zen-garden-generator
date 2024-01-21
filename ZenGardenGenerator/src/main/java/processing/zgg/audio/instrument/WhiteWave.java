@@ -16,7 +16,7 @@ import com.softsynth.shared.time.TimeStamp;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class WhiteWave extends Circuit implements UnitVoice {
     // Declare units and ports.

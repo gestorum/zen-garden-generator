@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public interface GbfsObjectMapper<T> {
 

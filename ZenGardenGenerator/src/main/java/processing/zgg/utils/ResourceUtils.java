@@ -16,7 +16,7 @@ import lombok.NonNull;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class ResourceUtils {
 

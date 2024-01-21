@@ -12,7 +12,7 @@ import processing.core.PVector;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class MotionUtils {
 

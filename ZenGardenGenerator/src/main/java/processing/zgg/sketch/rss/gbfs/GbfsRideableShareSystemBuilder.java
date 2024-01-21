@@ -22,7 +22,7 @@ import processing.zgg.sketch.rss.RideableShareSystemBuilder;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class GbfsRideableShareSystemBuilder implements RideableShareSystemBuilder {
 

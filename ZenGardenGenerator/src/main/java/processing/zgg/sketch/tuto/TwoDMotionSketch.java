@@ -14,7 +14,7 @@ import processing.zgg.utils.MotionUtils;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class TwoDMotionSketch extends ZenGardenSketch {
 

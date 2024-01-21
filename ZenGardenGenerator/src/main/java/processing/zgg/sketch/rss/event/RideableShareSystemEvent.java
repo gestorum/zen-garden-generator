@@ -6,7 +6,7 @@ package processing.zgg.sketch.rss.event;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public interface RideableShareSystemEvent {
  

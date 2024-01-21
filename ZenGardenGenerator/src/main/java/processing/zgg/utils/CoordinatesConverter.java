@@ -10,7 +10,7 @@ import processing.zgg.data.GeographicCoordinates;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class CoordinatesConverter {
 

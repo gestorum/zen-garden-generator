@@ -26,7 +26,7 @@ import processing.zgg.audio.instrument.WhiteWave;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class ZenGardenSoundGenerator {
 

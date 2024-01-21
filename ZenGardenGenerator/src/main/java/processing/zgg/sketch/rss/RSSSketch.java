@@ -17,7 +17,7 @@ import lombok.NonNull;
 import processing.core.PVector;
 import processing.zgg.sketch.ZenGardenSketch;
 import processing.zgg.audio.ZenGardenSoundGenerator;
-import processing.zgg.data.Particle;
+import processing.zgg.data.AbstractParticle;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
 import processing.zgg.sketch.rss.data.StationParticle;
@@ -26,7 +26,7 @@ import processing.zgg.sketch.rss.event.RideableShareSystemEventType;
 
 /**
  *
- * @author pbergeron
+ * @author gestorum
  */
 public class RSSSketch extends ZenGardenSketch {
 
@@ -156,7 +156,7 @@ public class RSSSketch extends ZenGardenSketch {
                 rideableSpeedUpFactor > 1 ? " x" + rideableSpeedUpFactor : "");
     }
     
-    private void drawParticle(@NonNull final Particle particle) {
+    private void drawParticle(@NonNull final AbstractParticle particle) {
         if (displayStations && particle.getClass().isAssignableFrom(StationParticle.class)) {
             drawStation((StationParticle)particle);
         } else if (displayRideables && particle.getClass().isAssignableFrom(RideableParticle.class)) {
