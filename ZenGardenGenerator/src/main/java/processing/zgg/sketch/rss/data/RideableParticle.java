@@ -18,19 +18,19 @@ import processing.zgg.data.AbstractParticle;
 @SuperBuilder
 public class RideableParticle extends AbstractParticle {
     
-    private static final float MAX_SPEED = 0.2f;
-    private static final float MAX_FORCE = 8;
+    private static final float MAX_VELOCITY_MAGNITUDE = 0.2f;
+    private static final float MAX_FORCE_MAGNITUDE = 8;
     
     private String id;
     private String stationId;
 
     @Override
-    public float getMaxSpeed() {
-        return MAX_SPEED;
+    public float getMaxVelocityMagnitude() {
+        return MAX_VELOCITY_MAGNITUDE;
     }
 
     @Override
-    public float getMaxForce() {
-        return MAX_FORCE;
+    public float getMaxForceMagnitude() {
+        return MAX_FORCE_MAGNITUDE;
     }
 }

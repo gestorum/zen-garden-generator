@@ -23,9 +23,9 @@ public abstract class AbstractParticle {
     private PVector acceleration;
     
     private float radius;
+    private int personalSpaceRadiusFactor;
     private boolean dead;
     private int speedUpFactor;
-    private int personalSpaceRadiusFactor;
 
     public void update() {
         if (this.velocity == null || this.position == null || this.acceleration == null) {
@@ -34,7 +34,7 @@ public abstract class AbstractParticle {
         
         this.velocity.add(this.acceleration);
         final int curSpeedUpFactor = Math.max(this.speedUpFactor, 1);
-        this.velocity.limit(getMaxSpeed() * curSpeedUpFactor);
+        this.velocity.limit(getMaxVelocityMagnitude() * curSpeedUpFactor);
         this.position.add(this.velocity);
         this.acceleration.mult(0);
     }
@@ -53,22 +53,22 @@ public abstract class AbstractParticle {
         }
         
         final int curSpeedUpFactor = Math.max(this.speedUpFactor, 1);
-        final float curMaxSpeed = getMaxSpeed() * curSpeedUpFactor;
-        final float curMaxForce = getMaxForce() * curSpeedUpFactor;
+        final float curMaxVelocityMag = getMaxVelocityMagnitude() * curSpeedUpFactor;
+        final float curMaxForceMag = getMaxForceMagnitude() * curSpeedUpFactor;
         final int curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
         final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
         
         final PVector desired = PVector.sub(target, this.position);
         if (desired.mag() < curRadius) {
             final float moderatedSpeed = MotionUtils.map(desired.mag(), 0,
-                    curRadius, 0, curMaxSpeed);
+                    curRadius, 0, curMaxVelocityMag);
             desired.setMag(moderatedSpeed);
         } else {
-            desired.setMag(curMaxSpeed);
+            desired.setMag(curMaxVelocityMag);
         }
         
         final PVector steer = PVector.sub(desired, this.velocity);
-        steer.limit(curMaxForce);
+        steer.limit(curMaxForceMag);
         this.applyForce(steer);
     }
     
@@ -83,6 +83,6 @@ public abstract class AbstractParticle {
         return isCollisionDetected(particle.getPosition());
     }
     
-    public abstract float getMaxSpeed();
-    public abstract float getMaxForce();
+    public abstract float getMaxVelocityMagnitude();
+    public abstract float getMaxForceMagnitude();
 }

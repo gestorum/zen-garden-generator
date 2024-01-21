@@ -19,8 +19,8 @@ import processing.zgg.data.AbstractParticle;
 @SuperBuilder
 public class StationParticle extends AbstractParticle {
     
-    private static final float MAX_SPEED = 0;
-    private static final float MAX_FORCE = 0;
+    private static final float MAX_VELOCITY_MAGNITUDE = 0;
+    private static final float MAX_FORCE_MAGNITUDE = 0;
     
     private String id;
     
@@ -35,12 +35,12 @@ public class StationParticle extends AbstractParticle {
     }
     
     @Override
-    public float getMaxSpeed() {
-        return MAX_SPEED;
+    public float getMaxVelocityMagnitude() {
+        return MAX_VELOCITY_MAGNITUDE;
     }
 
     @Override
-    public float getMaxForce() {
-        return MAX_FORCE;
+    public float getMaxForceMagnitude() {
+        return MAX_FORCE_MAGNITUDE;
     }
 }
