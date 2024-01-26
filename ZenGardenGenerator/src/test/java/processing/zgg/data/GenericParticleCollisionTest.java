@@ -20,8 +20,8 @@ public class GenericParticleCollisionTest {
 
     @ParameterizedTest
     @CsvSource({"2,1,82", "2,2,57", "2,3,32", "3,1,105", "3,2,80", "3,3,55"})
-    public void fullFrontalCollision(final int dimensions, final int personalSpaceFactor,
-            final int expectedCount) {
+    public void fullFrontalCollision(final int dimensions,
+            final int personalSpaceFactor, final int expectedCount) {
         final PVector p1Position;
         final PVector p2Position;
 
@@ -66,5 +66,17 @@ public class GenericParticleCollisionTest {
 
         assertTrue(distance < p1.getEffectiveRadius() + p2.getEffectiveRadius());
         assertEquals(expectedCount, count);
+    }
+    
+    @ParameterizedTest
+    @CsvSource({"0,0,0,true", "0,9,0,true", "0,10,0,false",
+        "0,0,9,true", "0,0,10,false", "15,0,0,false", "15,15,15,false"})
+    public void collisionWithDot(final int dotX, final int dotY, final int dotZ,
+            final boolean collisionExpected) {
+        final GenericParticle p = GenericParticleFactory.build(new PVector());
+        p.setRadius(10);
+
+        assertEquals(p.isCollisionDetected(new PVector(dotX, dotY, dotZ)),
+                collisionExpected);
     }
 }

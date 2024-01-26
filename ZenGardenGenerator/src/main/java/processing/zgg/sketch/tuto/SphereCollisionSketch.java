@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import processing.core.PVector;
+import processing.zgg.audio.ZenGardenSoundGenerator;
 import processing.zgg.data.GenericParticle;
 import processing.zgg.sketch.ZenGardenSketch;
 
@@ -23,99 +24,121 @@ public class SphereCollisionSketch extends ZenGardenSketch {
     private static final int INITIAL_MAP_HEIGHT = INITIAL_MAP_WIDTH;
 
     private static final int FRAME_RATE = 24;
+    
+    private static final Color BIG_BOX_STROKE_COLOR = Color.DARK_GRAY;
+    private static final float BIG_BOX_ROTATION_STEP = 0.2f;
+    
+    private static final Color SPHERE_FILL_COLOR = Color.WHITE;
+    private static final Color SPHERE_STROKE_COLOR = Color.GREEN;
+    private static final Color SPHERE_COLLISION_STROKE_COLOR = Color.RED;
+    
+    private static final Color DIRECTIONAL_LIGHT_COLOR = Color.ORANGE;
 
     private final List<GenericParticle> particles = new ArrayList<>();
+
+    private float x, y, z;
+    
+    private float bigBoxDimension;
+    private float halfBigBoxDimension;
+    private PVector bigBoxRotation;
+    private PVector directionalLightDirection;
 
     @Override
     public void settings() {
         size(INITIAL_MAP_WIDTH, INITIAL_MAP_HEIGHT, P3D);
-
-        final GenericParticle p1 = GenericParticle.builder()
-                .position(new PVector(120, 120, 0))
-                .velocity(new PVector())
-                .acceleration(new PVector())
-                .radius(100)
-                .personalSpaceRadiusFactor(1)
-                .maxVelocityMagnitude(7.75f)
-                .maxForceMagnitude(8)
-                .build();
-        particles.add(p1);
-
-        final GenericParticle p2 = GenericParticle.builder()
-                .position(new PVector(600, 200, 0))
-                .velocity(p1.getVelocity().copy())
-                .acceleration(p1.getAcceleration().copy())
-                .radius(p1.getRadius() * 1.5f)
-                .personalSpaceRadiusFactor(p1.getPersonalSpaceRadiusFactor())
-                .maxVelocityMagnitude(3.25f)
-                .maxForceMagnitude(9)
-                .build();
-        particles.add(p2);
         
-        final GenericParticle p3 = GenericParticle.builder()
-                .position(new PVector(90, 700, 0))
-                .velocity(p1.getVelocity().copy())
-                .acceleration(p1.getAcceleration().copy())
-                .radius(p1.getRadius() * 0.75f)
-                .personalSpaceRadiusFactor(p1.getPersonalSpaceRadiusFactor())
-                .maxVelocityMagnitude(9.25f)
-                .maxForceMagnitude(4)
-                .build();
-        particles.add(p3);
-        
-        final GenericParticle p4 = GenericParticle.builder()
-                .position(new PVector(580, 640, 0))
-                .velocity(p1.getVelocity().copy())
-                .acceleration(p1.getAcceleration().copy())
-                .radius(p1.getRadius() * 1.1f)
-                .personalSpaceRadiusFactor(p1.getPersonalSpaceRadiusFactor())
-                .maxVelocityMagnitude(6.75f)
-                .maxForceMagnitude(12)
-                .build();
-        particles.add(p4);
+        initSoundGenerator();
+        smooth(8);
+    }
 
-        randomSeek();
+    @Override
+    public void setup() {
+        super.setup();
+
+        frameRate(FRAME_RATE);
+
+        surface.setResizable(true);
+
+        windowResized();
     }
 
     @Override
     protected void drawFrame() {
         final float t = ((frameCount % FRAME_RATE) / (float) FRAME_RATE);
 
+        translate(x, y, z);
+
         noFill();
-        stroke(Color.GRAY.getRGB());
+        stroke(BIG_BOX_STROKE_COLOR.getRGB());
         strokeWeight(1);
-        rect(0, 0, width, height);
-        
+        rotateX(bigBoxRotation.x);
+        rotateY(bigBoxRotation.y);
+        box(bigBoxDimension);
+
         particles.forEach(p -> {
             final PVector position = p.getPosition();
-
+            
             push();
             translate(position.x, position.y, position.z);
-            noFill();
-            stroke(Color.WHITE.getRGB());
 
-            if (p.getPosition().x - p.getEffectiveRadius() < 0
-                    || p.getPosition().x + p.getEffectiveRadius() > width
-                    || p.getPosition().y - p.getEffectiveRadius() < 0
-                    || p.getPosition().y + p.getEffectiveRadius() > height) {
-                p.unseek();
-                
-                if (p.getVelocity().mag() > 0) {
-                    p.applyForce(PVector.mult(p.getVelocity(), -1f));
-                }
-            } else {
-                final Optional<GenericParticle> otherParticleOpt = particles.stream()
-                        .filter(op -> !op.equals(p) && p.isCollisionDetected(op))
-                        .findFirst();
-                if (otherParticleOpt.isPresent()) {
-                    final GenericParticle otherParticle = otherParticleOpt.get();
-                    otherParticle.unseek();
-                    p.unseek();
+            final float bigBoxMinLimit = (halfBigBoxDimension * -1) + p.getEffectiveRadius();
+            final float bigBoxMaxLimit = halfBigBoxDimension - p.getEffectiveRadius();
 
-                    otherParticle.applyForce(p.getVelocity());
-                    p.applyForce(otherParticle.getVelocity());
-                }
+            if (p.getPosition().x < bigBoxMinLimit) {
+                playHitBorderSound(-1);
+                p.getPosition().x = bigBoxMinLimit;
+                p.getVelocity().x *= -1;
             }
+
+            if (p.getPosition().x > bigBoxMaxLimit) {
+                playHitBorderSound(1);
+                p.getPosition().x = bigBoxMaxLimit;
+                p.getVelocity().x *= -1;
+            }
+
+            if (p.getPosition().y < bigBoxMinLimit) {
+                playHitBorderSound(0);
+                p.getPosition().y = bigBoxMinLimit;
+                p.getVelocity().y *= -1;
+            }
+
+            if (p.getPosition().y > bigBoxMaxLimit) {
+                playHitBorderSound(0);
+                p.getPosition().y = bigBoxMaxLimit;
+                p.getVelocity().y *= -1;
+            }
+
+            if (p.getPosition().z < bigBoxMinLimit) {
+                playHitBorderSound(0);
+                p.getPosition().z = bigBoxMinLimit;
+                p.getVelocity().z *= -1;
+            }
+
+            if (p.getPosition().z > bigBoxMaxLimit) {
+                playHitBorderSound(0);
+                p.getPosition().z = bigBoxMaxLimit;
+                p.getVelocity().z *= -1;
+            }
+
+            final Color strokeColor;
+            final Optional<GenericParticle> otherParticleOpt = particles.stream()
+                    .filter(op -> !op.equals(p) && p.isCollisionDetected(op))
+                    .findFirst();
+            if (otherParticleOpt.isPresent()) {
+                playSphereCollisionSound(p.getPosition().x / width);
+                strokeColor = SPHERE_COLLISION_STROKE_COLOR;
+                
+                final GenericParticle otherParticle = otherParticleOpt.get();
+                otherParticle.unseek();
+                p.unseek();
+
+                otherParticle.applyForce(p.getVelocity());
+                p.applyForce(otherParticle.getVelocity());
+            } else {
+                strokeColor = SPHERE_STROKE_COLOR;
+            }
+
+            p.update();
 
             if (t > 0 && p.getVelocity().mag() != 0) {
                 final float signum = Math.signum(p.getVelocity().heading()) * -1;
@@ -123,10 +146,19 @@ public class SphereCollisionSketch extends ZenGardenSketch {
             }
 
             rotateZ(-PI / 6);
+
+            stroke(strokeColor.getRGB());
+            fill(SPHERE_FILL_COLOR.getRGB());
             
-            p.update();
+            directionalLight(DIRECTIONAL_LIGHT_COLOR.getRed(),
+                    DIRECTIONAL_LIGHT_COLOR.getGreen(),
+                    DIRECTIONAL_LIGHT_COLOR.getBlue(),
+                    directionalLightDirection.x,
+                    directionalLightDirection.y,
+                    directionalLightDirection.z);
+            
             sphere(p.getRadius());
-            
+
             pop();
         });
     }
@@ -135,23 +167,116 @@ public class SphereCollisionSketch extends ZenGardenSketch {
     public void keyPressed() {
         super.keyPressed();
         
+        switch (keyCode) {
+            case UP -> {
+                bigBoxRotation.x = (bigBoxRotation.x + BIG_BOX_ROTATION_STEP) % PI;
+                directionalLightDirection.x += BIG_BOX_ROTATION_STEP % 1f;
+            }
+
+            case RIGHT -> {
+                bigBoxRotation.y = (bigBoxRotation.y + BIG_BOX_ROTATION_STEP) % PI;
+                directionalLightDirection.y += BIG_BOX_ROTATION_STEP % 1f;
+            }
+
+            case DOWN -> {
+                bigBoxRotation.x = (bigBoxRotation.x - BIG_BOX_ROTATION_STEP) % -PI;
+                directionalLightDirection.x -= BIG_BOX_ROTATION_STEP % -1f;
+            }
+
+            case LEFT -> {
+                bigBoxRotation.y = (bigBoxRotation.y - BIG_BOX_ROTATION_STEP) % -PI;
+                directionalLightDirection.y -= BIG_BOX_ROTATION_STEP % -1f;
+            }
+        }
+
         switch (Character.toLowerCase(key)) {
-            case 's' -> randomSeek();
+            case 'g' -> generateParticules();
         }
     }
+
+    @Override
+    public void windowResized() {
+        super.windowResized();
+        
+        x = width / 2;
+        y = height / 2;
+        z = 0;
+
+        bigBoxDimension = (x + y) / 2;
+        halfBigBoxDimension = bigBoxDimension / 2;
+        bigBoxRotation = new PVector(-PI / 6, PI / 3);
+        directionalLightDirection = new PVector(0, -1, 0);
+        
+        generateParticules();
+    }
     
+    private void generateParticules() {
+        final float minRadius = bigBoxDimension / 7;
+        final float maxRadius = bigBoxDimension / 5;
+        final float gap = minRadius;
+
+        float pX = 0 - bigBoxDimension * 0.2f;
+        float pY = pX;
+        float pZ = pY;
+
+        final List<PVector> positions = List.of(
+                new PVector(pX, pY, pZ),
+                new PVector(pX + maxRadius + gap, pY, pZ + maxRadius + gap),
+                new PVector(pX, pY + maxRadius + gap, pZ + maxRadius + gap),
+                new PVector(pX + maxRadius + gap, pY + maxRadius + gap, pZ)
+        );
+
+        final Random random = new Random();
+
+        particles.clear();
+        positions.forEach(p -> {
+            final float r = (float) random.doubles(minRadius, maxRadius + 1)
+                    .findFirst().getAsDouble();
+            final float velocityMag = (float) random.doubles(7, 20)
+                    .findFirst().getAsDouble();
+            final float forceMag = (float) random.doubles(7, 15)
+                    .findFirst().getAsDouble();
+
+            particles.add(GenericParticle.builder()
+                    .position(p)
+                    .velocity(new PVector())
+                    .acceleration(new PVector())
+                    .radius(r)
+                    .personalSpaceRadiusFactor(1)
+                    .maxVelocityMagnitude(velocityMag)
+                    .maxForceMagnitude(forceMag)
+                    .build());
+        });
+
+        randomSeek();
+    }
+
     private void randomSeek() {
         final Random random = new Random();
-        
+
         particles.forEach(p -> {
             final List<GenericParticle> otherParticles = particles.stream()
                     .filter(op -> !op.equals(p)).toList();
-            
-            final int randomIndex = random
-                    .ints(0, otherParticles.size())
-                    .findFirst().getAsInt();
-        
-            p.seek(otherParticles.get(randomIndex));
+
+            if (!otherParticles.isEmpty()) {
+                final int randomIndex = random
+                        .ints(0, otherParticles.size())
+                        .findFirst().getAsInt();
+
+                p.seek(otherParticles.get(randomIndex));
+            }
         });
+    }
+    
+    private void playHitBorderSound(final float pan) {
+        playFreq(ZenGardenSoundGenerator.Instrument.DRUM_WOOD,
+                ZenGardenSoundGenerator.Amplitude.MID.getValue(),
+                440, 1f, pan);
+    }
+    
+    private void playSphereCollisionSound(final float pan) {
+        playFreq(ZenGardenSoundGenerator.Instrument.WHITE_WAVE,
+                ZenGardenSoundGenerator.Amplitude.MID.getValue(),
+                440, 1f, pan);
     }
 }

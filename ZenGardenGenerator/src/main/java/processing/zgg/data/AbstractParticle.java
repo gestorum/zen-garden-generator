@@ -22,6 +22,7 @@ public abstract class AbstractParticle {
     private PVector position;
     private PVector velocity;
     private PVector acceleration;
+    private float mass;
     
     private float radius;
     private float personalSpaceRadiusFactor;
@@ -45,7 +46,7 @@ public abstract class AbstractParticle {
             throw new RuntimeException("Cannot apply force because acceleration has not been defined!");
         }
         
-        this.acceleration.add(force);
+        this.acceleration.add(PVector.div(force, mass > 0 ? mass : 1));
     }
     
     public void seek(@NonNull final PVector target) {
@@ -83,6 +84,11 @@ public abstract class AbstractParticle {
     
     public float getEffectiveRadius() {
         return this.radius * Math.max(this.personalSpaceRadiusFactor, 1);
+    }
+    
+    public boolean isCollisionDetected(@NonNull final PVector targetPosition) {
+        return PVector.dist(this.position, targetPosition)
+                < this.getEffectiveRadius();
     }
     
     public boolean isCollisionDetected(@NonNull final AbstractParticle particle) {

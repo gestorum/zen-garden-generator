@@ -131,6 +131,8 @@ public class RSSSketch extends ZenGardenSketch {
 
     @Override
     public void windowResized() {
+        super.windowResized();
+        
         rssParticleSystem.init(width, height);
         
         previousPositionListByRideableId.clear();
