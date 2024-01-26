@@ -6,11 +6,15 @@ package processing.zgg.sketch.tuto;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import lombok.NonNull;
 import processing.core.PVector;
 import processing.zgg.audio.ZenGardenSoundGenerator;
+import processing.zgg.data.AbstractParticle;
 import processing.zgg.data.GenericParticle;
 import processing.zgg.sketch.ZenGardenSketch;
 
@@ -33,8 +37,14 @@ public class SphereCollisionSketch extends ZenGardenSketch {
     private static final Color SPHERE_COLLISION_STROKE_COLOR = Color.RED;
     
     private static final Color DIRECTIONAL_LIGHT_COLOR = Color.ORANGE;
+    
+    private static final float EARTH_GRAVITY = 0.1f;
+    private static final PVector GRAVITY_FORCE = new PVector(0, EARTH_GRAVITY, 0);
 
+    private static final long COLLISION_DEATH_THRESHOLD_MILLIS = 3000;
+    
     private final List<GenericParticle> particles = new ArrayList<>();
+    private final Map<String, Long> firstCollisionMillisByParticuleId = new HashMap<>();
 
     private float x, y, z;
     
@@ -42,6 +52,8 @@ public class SphereCollisionSketch extends ZenGardenSketch {
     private float halfBigBoxDimension;
     private PVector bigBoxRotation;
     private PVector directionalLightDirection;
+    
+    private final boolean applyGravityForce = true;
 
     @Override
     public void settings() {
@@ -134,10 +146,27 @@ public class SphereCollisionSketch extends ZenGardenSketch {
 
                 otherParticle.applyForce(p.getVelocity());
                 p.applyForce(otherParticle.getVelocity());
+                
+                final long now = System.currentTimeMillis();
+                final Long lastCollision = firstCollisionMillisByParticuleId.get(p.getId());
+                
+                if (lastCollision == null) {
+                    firstCollisionMillisByParticuleId.put(p.getId(), now);
+                } else if ((now - lastCollision.longValue()) > COLLISION_DEATH_THRESHOLD_MILLIS) {
+                    playSphereMergeSound(0);
+                    firstCollisionMillisByParticuleId.remove(p.getId());
+                    p.setDead(true);
+                    otherParticle.setRadius(otherParticle.getRadius() + p.getRadius() / 2);
+                }
             } else {
+                firstCollisionMillisByParticuleId.remove(p.getId());
                 strokeColor = SPHERE_STROKE_COLOR;
             }
 
+            if (applyGravityForce) {
+                p.applyForce(GRAVITY_FORCE);
+            }
+            
             p.update();
 
             if (t > 0 && p.getVelocity().mag() != 0) {
@@ -161,6 +190,9 @@ public class SphereCollisionSketch extends ZenGardenSketch {
 
             pop();
         });
+        
+        particles.removeAll(particles.stream()
+                .filter(AbstractParticle::isDead).toList());
     }
     
     @Override
@@ -228,13 +260,17 @@ public class SphereCollisionSketch extends ZenGardenSketch {
 
         final Random random = new Random();
 
+        firstCollisionMillisByParticuleId.clear();
         particles.clear();
+        
         positions.forEach(p -> {
             final float r = (float) random.doubles(minRadius, maxRadius + 1)
                     .findFirst().getAsDouble();
-            final float velocityMag = (float) random.doubles(7, 20)
+            final float velocityMag = (float) random.doubles(7, 21)
                     .findFirst().getAsDouble();
-            final float forceMag = (float) random.doubles(7, 15)
+            final float forceMag = (float) random.doubles(7, 21)
+                    .findFirst().getAsDouble();
+            final float mass = (float) random.doubles(1, 1.26)
                     .findFirst().getAsDouble();
 
             particles.add(GenericParticle.builder()
@@ -245,27 +281,30 @@ public class SphereCollisionSketch extends ZenGardenSketch {
                     .personalSpaceRadiusFactor(1)
                     .maxVelocityMagnitude(velocityMag)
                     .maxForceMagnitude(forceMag)
+                    .mass(mass)
                     .build());
         });
 
         randomSeek();
     }
-
-    private void randomSeek() {
+    
+    private void randomSeek(@NonNull final GenericParticle p) {
         final Random random = new Random();
 
-        particles.forEach(p -> {
-            final List<GenericParticle> otherParticles = particles.stream()
-                    .filter(op -> !op.equals(p)).toList();
+        final List<GenericParticle> otherParticles = particles.stream()
+                .filter(op -> !op.equals(p)).toList();
 
-            if (!otherParticles.isEmpty()) {
-                final int randomIndex = random
-                        .ints(0, otherParticles.size())
-                        .findFirst().getAsInt();
+        if (!otherParticles.isEmpty()) {
+            final int randomIndex = random
+                    .ints(0, otherParticles.size())
+                    .findFirst().getAsInt();
 
-                p.seek(otherParticles.get(randomIndex));
-            }
-        });
+            p.seek(otherParticles.get(randomIndex));
+        }
+    }
+
+    private void randomSeek() {
+        particles.forEach(p -> randomSeek(p));
     }
     
     private void playHitBorderSound(final float pan) {
@@ -278,5 +317,11 @@ public class SphereCollisionSketch extends ZenGardenSketch {
         playFreq(ZenGardenSoundGenerator.Instrument.WHITE_WAVE,
                 ZenGardenSoundGenerator.Amplitude.MID.getValue(),
                 440, 1f, pan);
+    }
+    
+    private void playSphereMergeSound(final float pan) {
+        playFreq(ZenGardenSoundGenerator.Instrument.SYNTH,
+                ZenGardenSoundGenerator.Amplitude.MID.getValue(),
+                580, 1f, pan);
     }
 }
