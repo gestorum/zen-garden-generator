@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package processing.zgg.data;
+package processing.zgg.particle;
 
 import java.util.List;
+import processing.zgg.particle.data.AbstractParticle;
 
 /**
  *
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public interface ParticleSystem<T> {
     
-    void init(int width, int height);
+    void init(int width, int height, int depth);
     void update();
     
     List<AbstractParticle> getParticles();

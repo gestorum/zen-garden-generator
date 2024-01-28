@@ -17,7 +17,7 @@ import lombok.NonNull;
 import processing.core.PVector;
 import processing.zgg.sketch.ZenGardenSketch;
 import processing.zgg.audio.ZenGardenSoundGenerator;
-import processing.zgg.data.AbstractParticle;
+import processing.zgg.particle.data.AbstractParticle;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
 import processing.zgg.sketch.rss.data.StationParticle;
@@ -133,7 +133,7 @@ public class RSSSketch extends ZenGardenSketch {
     public void windowResized() {
         super.windowResized();
         
-        rssParticleSystem.init(width, height);
+        rssParticleSystem.init(width, height, 0);
         
         previousPositionListByRideableId.clear();
     }

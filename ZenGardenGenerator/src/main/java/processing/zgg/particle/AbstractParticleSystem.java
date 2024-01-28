@@ -2,10 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package processing.zgg.data;
+package processing.zgg.particle;
 
 import java.util.Collection;
 import lombok.NonNull;
+import processing.zgg.particle.data.AbstractParticle;
 
 /**
  *
@@ -16,6 +17,7 @@ public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     protected T system;
     protected int width;
     protected int height;
+    protected int depth;
     
     private int speedUpFactor;
 

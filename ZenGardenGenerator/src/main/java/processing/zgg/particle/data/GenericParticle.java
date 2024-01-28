@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package processing.zgg.data;
+package processing.zgg.particle.data;
 
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import processing.zgg.data.AbstractParticle;
 
 /**
  *

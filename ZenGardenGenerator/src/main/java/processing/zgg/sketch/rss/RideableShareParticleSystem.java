@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import processing.core.PVector;
-import processing.zgg.data.AbstractParticle;
-import processing.zgg.data.AbstractParticleSystem;
+import processing.zgg.particle.data.AbstractParticle;
+import processing.zgg.particle.AbstractParticleSystem;
 import processing.zgg.sketch.rss.data.OperationArea;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
@@ -54,7 +54,7 @@ public class RideableShareParticleSystem
     }
     
     @Override
-    public void init(final int width, final int height) {
+    public void init(final int width, final int height, final int depth) {
         final OperationArea operationArea = system.getOperationArea();
         if (operationArea == null || !operationArea.isFilled()) {
             return;
@@ -67,6 +67,7 @@ public class RideableShareParticleSystem
 
         this.width = width;
         this.height = height;
+        this.depth = depth;
         
         this.stationWidth = Math.max(Math.round(width * STATION_WIDTH_RATIO), STATION_MIN_WIDTH);
         this.rideableWidth = Math.max(Math.round(width * RIDEABLE_WIDTH_RATIO), RIDEABLE_MIN_WIDTH);

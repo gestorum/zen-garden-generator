@@ -6,6 +6,7 @@ package processing.zgg.data;
 
 import lombok.NonNull;
 import processing.core.PVector;
+import processing.zgg.particle.data.GenericParticle;
 
 /**
  *
