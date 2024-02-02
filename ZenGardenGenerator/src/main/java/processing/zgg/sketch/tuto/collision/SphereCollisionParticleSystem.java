@@ -5,14 +5,18 @@
 package processing.zgg.sketch.tuto.collision;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import lombok.NonNull;
 import processing.core.PVector;
 import processing.zgg.particle.AbstractParticleSystem;
 import processing.zgg.particle.data.AbstractParticle;
 import processing.zgg.particle.data.GenericParticle;
+import processing.zgg.particle.event.BoxCollisionEvent;
+import processing.zgg.particle.event.ParticleCollisionEvent;
 
 /**
  *
@@ -49,15 +53,18 @@ public class SphereCollisionParticleSystem
         particles.forEach(p -> {
             final PVector position = p.getPosition();
             
+            Set<BoxCollisionEvent.Border> boxCollisionBorders = new HashSet<>();
             final float minWidthLimit = halfWidth * -1 + p.getEffectiveRadius();
             if (position.x < minWidthLimit) {
                 position.x = minWidthLimit;
                 p.getVelocity().x *= -1;
+                boxCollisionBorders.add(BoxCollisionEvent.Border.X_LEFT);
             } else {
                 final float maxWidthLimit = halfWidth - p.getEffectiveRadius();
                 if (position.x > maxWidthLimit) {
                     position.x = maxWidthLimit;
                     p.getVelocity().x *= -1;
+                    boxCollisionBorders.add(BoxCollisionEvent.Border.X_RIGHT);
                 }
             }
 
@@ -65,11 +72,13 @@ public class SphereCollisionParticleSystem
             if (position.y < minHeightLimit) {
                 position.y = minHeightLimit;
                 p.getVelocity().y *= -1;
+                boxCollisionBorders.add(BoxCollisionEvent.Border.Y_TOP);
             } else {
                 final float maxHeightLimit = halfHeight - p.getEffectiveRadius();
                 if (position.y > maxHeightLimit) {
                     position.y = maxHeightLimit;
                     p.getVelocity().y *= -1;
+                    boxCollisionBorders.add(BoxCollisionEvent.Border.Y_BOTTOM);
                 }
             }
 
@@ -77,12 +86,21 @@ public class SphereCollisionParticleSystem
             if (position.z < minDepthLimit) {
                 position.z = minDepthLimit;
                 p.getVelocity().z *= -1;
+                boxCollisionBorders.add(BoxCollisionEvent.Border.Z_NEAREST);
             } else {
                 final float maxDepthLimit = halfDepth - p.getEffectiveRadius();
                 if (position.z > maxDepthLimit) {
                     position.z = maxDepthLimit;
                     p.getVelocity().z *= -1;
+                    boxCollisionBorders.add(BoxCollisionEvent.Border.Z_FARTHEST);
                 }
+            }
+            
+            if (!boxCollisionBorders.isEmpty()) {
+                publishEvent(BoxCollisionEvent.builder()
+                        .particle(p)
+                        .borders(boxCollisionBorders)
+                        .build());
             }
 
             final Optional<AbstractParticle> otherParticleOpt = particles.stream()
@@ -95,6 +113,11 @@ public class SphereCollisionParticleSystem
 
                 otherParticle.applyForce(p.getVelocity());
                 p.applyForce(otherParticle.getVelocity());
+                
+                publishEvent(ParticleCollisionEvent.builder()
+                        .particle(p)
+                        .otherParticles(Set.of(otherParticle))
+                        .build());
             }
             
             p.update();
@@ -105,7 +128,7 @@ public class SphereCollisionParticleSystem
     public List<AbstractParticle> getParticles() {
         return particles;
     }
-    
+
     public void generateParticules() {
         final float minDimension = Math.min(width, height);
         final float minRadius = minDimension / 7;

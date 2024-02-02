@@ -5,15 +5,24 @@
 package processing.zgg.sketch.tuto.collision;
 
 import java.awt.Color;
+import java.util.Set;
+import lombok.NonNull;
 import processing.core.PVector;
 import processing.event.MouseEvent;
+import processing.zgg.audio.ZenGardenSoundGenerator;
+import processing.zgg.particle.data.AbstractParticle;
+import processing.zgg.particle.event.BoxCollisionEvent;
+import processing.zgg.particle.event.ParticleCollisionEvent;
+import processing.zgg.particle.event.ParticleSystemEvent;
+import processing.zgg.particle.event.ParticleSystemEventListener;
 import processing.zgg.sketch.ZenGardenSketch;
 
 /**
  *
  * @author gestorum
  */
-public class SphereCollisionSketch extends ZenGardenSketch {
+public class SphereCollisionSketch extends ZenGardenSketch
+        implements ParticleSystemEventListener {
 
     private static final int INITIAL_MAP_WIDTH = 800;
     private static final int INITIAL_MAP_HEIGHT = INITIAL_MAP_WIDTH;
@@ -41,7 +50,10 @@ public class SphereCollisionSketch extends ZenGardenSketch {
     public void settings() {
         size(INITIAL_MAP_WIDTH, INITIAL_MAP_HEIGHT, P3D);
         
+        initSoundGenerator();
+        
         this.boxRestrictedParticleSystem = new SphereCollisionParticleSystem();
+        this.boxRestrictedParticleSystem.addEventListener(this);
     }
 
     @Override
@@ -141,6 +153,20 @@ public class SphereCollisionSketch extends ZenGardenSketch {
         sceneRotation = new PVector(-PI / 6, PI / 3);
         directionalLightDirection = new PVector(0, -1, 0);
     }
+
+    @Override
+    public void processEvent(@NonNull ParticleSystemEvent event) {
+        
+        if (BoxCollisionEvent.class.isAssignableFrom(event.getClass())) {
+            final BoxCollisionEvent boxCollisionEvent = (BoxCollisionEvent)event;
+            final Set<BoxCollisionEvent.Border> borders = boxCollisionEvent.getBorders();
+            borders.forEach(b -> playHitBorderSound(0));
+        } else if (ParticleCollisionEvent.class.isAssignableFrom(event.getClass())) {
+            final ParticleCollisionEvent particleCollisionEvent = (ParticleCollisionEvent)event;
+            final Set<AbstractParticle> otherParticles = particleCollisionEvent.getOtherParticles();
+            otherParticles.forEach(op -> playSphereCollisionSound(0));
+        }
+    }
     
     private void rotateScene(final int axis, final float value) {
         final float valueSignum = Math.signum(value);
@@ -163,5 +189,17 @@ public class SphereCollisionSketch extends ZenGardenSketch {
                 directionalLightDirection.z += value % maxLightDirection;
             }
         }
+    }
+    
+    private void playHitBorderSound(final float pan) {
+        playFreq(ZenGardenSoundGenerator.Instrument.DRUM_WOOD,
+                ZenGardenSoundGenerator.Amplitude.MID.getValue(),
+                440, 1f, pan);
+    }
+    
+    private void playSphereCollisionSound(final float pan) {
+        playFreq(ZenGardenSoundGenerator.Instrument.WHITE_WAVE,
+                ZenGardenSoundGenerator.Amplitude.MID.getValue(),
+                440, 1f, pan);
     }
 }

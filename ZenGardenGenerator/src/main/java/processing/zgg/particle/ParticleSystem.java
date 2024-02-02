@@ -6,6 +6,7 @@ package processing.zgg.particle;
 
 import java.util.List;
 import processing.zgg.particle.data.AbstractParticle;
+import processing.zgg.particle.event.ParticleSystemEventListener;
 
 /**
  *
@@ -20,4 +21,7 @@ public interface ParticleSystem<T> {
     
     int getSpeedUpFactor();
     void setSpeedUpFactor(int factor);
+    
+    void addEventListener(ParticleSystemEventListener eventListener);
+    void removeEventListener(ParticleSystemEventListener eventListener);
 }
