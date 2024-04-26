@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,6 +20,7 @@ import lombok.NonNull;
 import processing.core.PVector;
 import processing.zgg.particle.data.AbstractParticle;
 import processing.zgg.particle.AbstractParticleSystem;
+import processing.zgg.particle.event.ParticleCollisionEvent;
 import processing.zgg.sketch.rss.data.OperationArea;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
@@ -37,7 +39,6 @@ public class RideableShareParticleSystem
     
     private static final int RIDEABLE_MIN_WIDTH = 1;
     private static final float RIDEABLE_WIDTH_RATIO = 0.002f;
-    private static final int RIDEABLE_PERSONAL_SPACE_RADIUS_FACTOR = 20;
     
     private static final int RIDEABLE_MIN_VELOCITY = 1;
     private static final int RIDEABLE_MAX_VELOCITY = 10;
@@ -108,7 +109,6 @@ public class RideableShareParticleSystem
                         .velocity(randomizeRideableVelocity(null))
                         .acceleration(new PVector())
                         .radius(rideableWidth)
-                        .personalSpaceRadiusFactor(RIDEABLE_PERSONAL_SPACE_RADIUS_FACTOR)
                         .build();
                 rideableParticles.add(rideableParticule);
             }
@@ -151,10 +151,18 @@ public class RideableShareParticleSystem
                 p.setSpeedUpFactor(getSpeedUpFactor());
             
                 final Optional<RideableParticle> detectedParticle = rideableParticles
-                        .stream().filter(p::isCollisionDetected).findFirst();
+                        .stream().filter(op -> !op.getId().equals(p.getId()))
+                        .filter(p::isCollisionDetected).findFirst();
 
                 if (detectedParticle.isPresent()) {
-                    p.applyForce(detectedParticle.get().getVelocity());
+                    final PVector pVel = p.getVelocity().copy();
+                    p.applyForce(detectedParticle.get().getVelocity().div(2));
+                    detectedParticle.get().applyForce(pVel.div(2));
+                    
+                    publishEvent(ParticleCollisionEvent.builder()
+                            .particle(p)
+                            .otherParticles(Set.of(detectedParticle.get()))
+                            .build());
                 }
                 
                 p.update();
@@ -167,7 +175,7 @@ public class RideableShareParticleSystem
         return Stream.of(rideableParticles, stationParticles)
                 .flatMap(Collection::stream).collect(Collectors.toList());
     }
-    
+
     public PVector randomizeRideablePosition() {
         final Random random = new Random();
         

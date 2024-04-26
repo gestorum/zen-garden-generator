@@ -45,6 +45,7 @@ public class SphereCollisionSketch extends ZenGardenSketch
     private int bigBoxDimension;
     private PVector sceneRotation;
     private PVector directionalLightDirection;
+    private int sphereSpeedUpFactor = 1;
 
     @Override
     public void settings() {
@@ -123,6 +124,16 @@ public class SphereCollisionSketch extends ZenGardenSketch
             case RIGHT -> rotateScene(Y, SCENE_ROTATION_STEP);
             case DOWN -> rotateScene(X, SCENE_ROTATION_STEP * -1);
             case LEFT -> rotateScene(Y, SCENE_ROTATION_STEP * -1);
+            
+            case 139 -> { // Num +
+                sphereSpeedUpFactor++;
+                boxRestrictedParticleSystem.setSpeedUpFactor(sphereSpeedUpFactor);
+            }
+
+            case 140 -> { // Num -
+                sphereSpeedUpFactor = Math.max(sphereSpeedUpFactor - 1, 1);
+                boxRestrictedParticleSystem.setSpeedUpFactor(sphereSpeedUpFactor);
+            }
         }
 
         switch (Character.toLowerCase(key)) {

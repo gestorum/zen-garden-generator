@@ -18,6 +18,10 @@ import processing.core.PVector;
 import processing.zgg.sketch.ZenGardenSketch;
 import processing.zgg.audio.ZenGardenSoundGenerator;
 import processing.zgg.particle.data.AbstractParticle;
+import processing.zgg.particle.event.ParticleCollisionEvent;
+import processing.zgg.particle.event.ParticleSystemEvent;
+import processing.zgg.particle.event.ParticleSystemEventListener;
+import processing.zgg.particle.event.ParticleSystemEventType;
 import processing.zgg.sketch.rss.data.RideableParticle;
 import processing.zgg.sketch.rss.data.Station;
 import processing.zgg.sketch.rss.data.StationParticle;
@@ -28,7 +32,8 @@ import processing.zgg.sketch.rss.event.RideableShareSystemEventType;
  *
  * @author gestorum
  */
-public class RSSSketch extends ZenGardenSketch {
+public class RSSSketch extends ZenGardenSketch
+    implements ParticleSystemEventListener {
 
     private static final int INITIAL_MAP_WIDTH = 512;
     private static final int INITIAL_MAP_HEIGHT = INITIAL_MAP_WIDTH;
@@ -42,6 +47,7 @@ public class RSSSketch extends ZenGardenSketch {
     private static final Color STATION_RIDEABLE_REFUSED_FILL_COLOR = Color.RED;
     
     private static final Color RIDEABLE_STROKE_COLOR = Color.WHITE;
+    private static final Color RIDEABLE_COLLISION_STROKE_COLOR = Color.RED;
     private static final Color RIDEABLE_TRAIL_STROKE_COLOR = Color.GRAY;
     private static final int RIDEABLE_TRAIL_MAX_LENGTH = 6;
 
@@ -56,6 +62,7 @@ public class RSSSketch extends ZenGardenSketch {
     
     private final Map<String, List<RideableShareSystemStationEvent>> stationEventsByStationId = new HashMap<>();
     private final Map<String, List<StationAnimation>> stationAnimationListByStationId = new HashMap<>();
+    private final Map<String, List<RideableAnimation>> rideableAnimationListByRideableId = new HashMap<>();
     private final Map<String, List<PVector>> previousPositionListByRideableId = new HashMap<>();
 
     @Override
@@ -69,6 +76,7 @@ public class RSSSketch extends ZenGardenSketch {
         try {
             rideableShareSystem = new GbfsRideableShareSystemBuilder().build(args[0]);
             rssParticleSystem = new RideableShareParticleSystem(rideableShareSystem);
+            rssParticleSystem.addEventListener(this);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot init rideable share system", e);
         }
@@ -139,6 +147,26 @@ public class RSSSketch extends ZenGardenSketch {
     }
 
     @Override
+    public void processEvent(@NonNull ParticleSystemEvent event) {
+        if (event.getType() == ParticleSystemEventType.COLLISION &&
+                ParticleCollisionEvent.class.isAssignableFrom(event.getClass())) {
+            final ParticleCollisionEvent particleCollisionEvent = (ParticleCollisionEvent) event;
+            final AbstractParticle particle = particleCollisionEvent.getParticle();
+            if (RideableParticle.class.isAssignableFrom(particle.getClass())) {
+                final RideableParticle rideableParticle = (RideableParticle) particle;
+                List<RideableAnimation> rideableAnimations = rideableAnimationListByRideableId.get(rideableParticle.getId());
+                if (rideableAnimations == null) {
+                    rideableAnimations = new ArrayList<>();
+                    rideableAnimationListByRideableId.put(rideableParticle.getId(), rideableAnimations);
+                }
+                rideableAnimations.add(RideableAnimation.builder()
+                        .color(RIDEABLE_COLLISION_STROKE_COLOR)
+                        .build());
+            }
+        }
+    }
+
+    @Override
     protected String getFrameRecordingFilenamePrefix() {
         return rideableShareSystem.getName();
     }
@@ -200,7 +228,7 @@ public class RSSSketch extends ZenGardenSketch {
             if (stationEvent != null) {
                 final StationAnimation.StationAnimationBuilder animationBuilder = StationAnimation.builder();
                 animationBuilder.stationId(stationParticle.getId());
-                animationBuilder.widthList(generateWidthList(station, stationWidth));
+                animationBuilder.widthList(generateStationWidthList(station, stationWidth));
 
                 final float amplitude = Math.min(ZenGardenSoundGenerator.Amplitude.MID.getValue()
                         + station.getCapacity() / 100f,
@@ -286,7 +314,18 @@ public class RSSSketch extends ZenGardenSketch {
         
         push();
         fill(RIDEABLE_STROKE_COLOR.getRGB());
-        stroke(RIDEABLE_STROKE_COLOR.getRGB());
+        
+        final Color rideableColor;
+        final List<RideableAnimation> rideableAnimations = rideableAnimationListByRideableId
+                .get(rideableParticle.getId());
+        if (rideableAnimations != null && !rideableAnimations.isEmpty()) {
+            final RideableAnimation rideableAnimation = rideableAnimations.remove(0);
+            rideableColor = rideableAnimation.getColor();
+        } else {
+            rideableColor = RIDEABLE_STROKE_COLOR;
+        }
+        
+        stroke(rideableColor.getRGB());
         strokeWeight(rideableWidth);
 //        translate(rideablePosition.x, rideablePosition.y);
 //        rotate(rideableParticle.getVelocity().heading());
@@ -326,7 +365,7 @@ public class RSSSketch extends ZenGardenSketch {
         }
     }
     
-    private List<Integer> generateWidthList(@NonNull final Station station,
+    private List<Integer> generateStationWidthList(@NonNull final Station station,
             final int stationWidth) {
         final List<Integer> stationWidthList = new ArrayList<>();
 
@@ -342,7 +381,7 @@ public class RSSSketch extends ZenGardenSketch {
 
         return stationWidthList;
     }
-
+    
     private RideableShareSystemStationEvent getNextStationEvent(@NonNull final String stationId) {
         final List<RideableShareSystemStationEvent> stationEvents = stationEventsByStationId.get(stationId);
         if (stationEvents == null || stationEvents.isEmpty()) {

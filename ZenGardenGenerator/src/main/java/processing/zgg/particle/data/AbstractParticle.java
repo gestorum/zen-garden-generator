@@ -25,7 +25,6 @@ public abstract class AbstractParticle {
     private float mass;
     
     private float radius;
-    private float personalSpaceRadiusFactor;
     private boolean dead;
     private int speedUpFactor;
 
@@ -57,8 +56,7 @@ public abstract class AbstractParticle {
         final int curSpeedUpFactor = Math.max(this.speedUpFactor, 1);
         final float curMaxVelocityMag = getMaxVelocityMagnitude() * curSpeedUpFactor;
         final float curMaxForceMag = getMaxForceMagnitude() * curSpeedUpFactor;
-        final float curPersonalSpaceRadiusFactor = Math.max(this.personalSpaceRadiusFactor, 1);
-        final float curRadius = this.radius * curPersonalSpaceRadiusFactor;
+        final float curRadius = this.radius;
         
         final PVector desired = PVector.sub(target, this.position);
         if (desired.mag() < curRadius) {
@@ -82,18 +80,13 @@ public abstract class AbstractParticle {
         seek(this);
     }
     
-    public float getEffectiveRadius() {
-        return this.radius * Math.max(this.personalSpaceRadiusFactor, 1);
-    }
-    
     public boolean isCollisionDetected(@NonNull final PVector targetPosition) {
-        return PVector.dist(this.position, targetPosition)
-                < this.getEffectiveRadius();
+        return PVector.dist(this.position, targetPosition) < this.radius;
     }
     
     public boolean isCollisionDetected(@NonNull final AbstractParticle particle) {
         return PVector.dist(this.position, particle.getPosition())
-                < this.getEffectiveRadius() + particle.getEffectiveRadius();
+                < this.radius + particle.getRadius();
     }
     
     public abstract float getMaxVelocityMagnitude();

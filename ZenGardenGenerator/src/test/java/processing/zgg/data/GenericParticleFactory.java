@@ -27,7 +27,6 @@ public class GenericParticleFactory {
                 .velocity(new PVector(1, 1, 1))
                 .acceleration(new PVector())
                 .radius(PARTICLE_RADIUS_DEFAULT)
-                .personalSpaceRadiusFactor(1f)
                 .maxVelocityMagnitude(PARTICLE_MAX_VELOCITY_MAGNITUDE_DEFAULT)
                 .maxForceMagnitude(PARTICLE_MAX_FORCE_MAGNITUDE_DEFAULT)
                 .build();

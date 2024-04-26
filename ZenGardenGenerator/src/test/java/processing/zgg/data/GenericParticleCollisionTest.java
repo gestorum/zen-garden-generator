@@ -20,9 +20,8 @@ public class GenericParticleCollisionTest {
     private static final int MAX_COUNT = 250;
 
     @ParameterizedTest
-    @CsvSource({"2,1,82", "2,2,57", "2,3,32", "3,1,105", "3,2,80", "3,3,55"})
-    public void fullFrontalCollision(final int dimensions,
-            final int personalSpaceFactor, final int expectedCount) {
+    @CsvSource({"2,82", "3,105"})
+    public void fullFrontalCollision(final int dimensions, final int expectedCount) {
         final PVector p1Position;
         final PVector p2Position;
 
@@ -42,16 +41,12 @@ public class GenericParticleCollisionTest {
         }
 
         final GenericParticle p1 = GenericParticleFactory.build(p1Position);
-        p1.setPersonalSpaceRadiusFactor(personalSpaceFactor);
-
         final GenericParticle p2 = GenericParticleFactory.build(p2Position);
-        p2.setPersonalSpaceRadiusFactor(personalSpaceFactor);
 
         p1.seek(p2);
         p2.seek(p1);
 
-        System.out.println(String.format("--- %dD; personalSpaceFactor: %d ---",
-                dimensions, personalSpaceFactor));
+        System.out.println(String.format("--- %dD", dimensions));
 
         int count = 0;
         float distance;
@@ -65,7 +60,7 @@ public class GenericParticleCollisionTest {
             count++;
         } while (!p1.isCollisionDetected(p2) && count < MAX_COUNT);
 
-        assertTrue(distance < p1.getEffectiveRadius() + p2.getEffectiveRadius());
+        assertTrue(distance < p1.getRadius() + p2.getRadius());
         assertEquals(expectedCount, count);
     }
     

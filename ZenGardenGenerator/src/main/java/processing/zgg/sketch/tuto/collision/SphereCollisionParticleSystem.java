@@ -54,13 +54,13 @@ public class SphereCollisionParticleSystem
             final PVector position = p.getPosition();
             
             Set<BoxCollisionEvent.Border> boxCollisionBorders = new HashSet<>();
-            final float minWidthLimit = halfWidth * -1 + p.getEffectiveRadius();
+            final float minWidthLimit = halfWidth * -1 + p.getRadius();
             if (position.x < minWidthLimit) {
                 position.x = minWidthLimit;
                 p.getVelocity().x *= -1;
                 boxCollisionBorders.add(BoxCollisionEvent.Border.X_LEFT);
             } else {
-                final float maxWidthLimit = halfWidth - p.getEffectiveRadius();
+                final float maxWidthLimit = halfWidth - p.getRadius();
                 if (position.x > maxWidthLimit) {
                     position.x = maxWidthLimit;
                     p.getVelocity().x *= -1;
@@ -68,13 +68,13 @@ public class SphereCollisionParticleSystem
                 }
             }
 
-            final float minHeightLimit = halfHeight * -1 + p.getEffectiveRadius();
+            final float minHeightLimit = halfHeight * -1 + p.getRadius();
             if (position.y < minHeightLimit) {
                 position.y = minHeightLimit;
                 p.getVelocity().y *= -1;
                 boxCollisionBorders.add(BoxCollisionEvent.Border.Y_TOP);
             } else {
-                final float maxHeightLimit = halfHeight - p.getEffectiveRadius();
+                final float maxHeightLimit = halfHeight - p.getRadius();
                 if (position.y > maxHeightLimit) {
                     position.y = maxHeightLimit;
                     p.getVelocity().y *= -1;
@@ -82,13 +82,13 @@ public class SphereCollisionParticleSystem
                 }
             }
 
-            final float minDepthLimit = halfDepth * -1 + p.getEffectiveRadius();
+            final float minDepthLimit = halfDepth * -1 + p.getRadius();
             if (position.z < minDepthLimit) {
                 position.z = minDepthLimit;
                 p.getVelocity().z *= -1;
                 boxCollisionBorders.add(BoxCollisionEvent.Border.Z_NEAREST);
             } else {
-                final float maxDepthLimit = halfDepth - p.getEffectiveRadius();
+                final float maxDepthLimit = halfDepth - p.getRadius();
                 if (position.z > maxDepthLimit) {
                     position.z = maxDepthLimit;
                     p.getVelocity().z *= -1;
@@ -120,6 +120,7 @@ public class SphereCollisionParticleSystem
                         .build());
             }
             
+            p.setSpeedUpFactor(getSpeedUpFactor());
             p.update();
         });
     }
@@ -165,7 +166,6 @@ public class SphereCollisionParticleSystem
                     .velocity(new PVector())
                     .acceleration(new PVector())
                     .radius(r)
-                    .personalSpaceRadiusFactor(1)
                     .maxVelocityMagnitude(velocityMag)
                     .maxForceMagnitude(forceMag)
                     .mass(mass)
