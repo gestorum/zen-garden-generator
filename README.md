@@ -8,6 +8,8 @@ Particle system with event handling & basic collision management. Everything is 
 
 Dependencies:
 
+https://github.com/projectlombok/lombok
+https://github.com/FasterXML/jackson
 https://github.com/benfry/processing4
 https://github.com/philburk/jsyn
 
