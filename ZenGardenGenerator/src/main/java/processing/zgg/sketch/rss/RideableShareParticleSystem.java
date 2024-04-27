@@ -6,9 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -115,6 +113,8 @@ public class RideableShareParticleSystem
             p.setStationId(stationParticle.getId());
             p.seek(stationParticle);
         });
+        
+        super.init(width, height, depth);
     }
     
     public long getStationCount() {
@@ -145,23 +145,27 @@ public class RideableShareParticleSystem
             if (stationParticle != null) {
                 p.seek(stationParticle);
                 p.setSpeedUpFactor(getSpeedUpFactor());
-            
-                final Optional<RideableParticle> detectedParticle = rideableParticles
-                        .stream().filter(op -> !op.getId().equals(p.getId()))
-                        .filter(p::isCollisionDetected).findFirst();
-
-                if (detectedParticle.isPresent()) {
-                    final PVector pVel = p.getVelocity().copy();
-                    p.applyForce(detectedParticle.get().getVelocity().div(2));
-                    detectedParticle.get().applyForce(pVel.div(2));
+                
+                final List<? extends AbstractParticle> collisions =
+                        findCollisions(p);
+                
+                if (!collisions.isEmpty()) {
+                    collisions.forEach(c -> {
+                        p.applyForce(PVector.div(c.getVelocity(), 2));
+                        c.applyForce(PVector.div(p.getVelocity(), 2));
+                        
+                        update(p);
+                        update(c);
+                    });
                     
                     publishEvent(ParticleCollisionEvent.builder()
                             .particle(p)
-                            .otherParticles(Set.of(detectedParticle.get()))
+                            .otherParticles(collisions.stream()
+                                    .collect(Collectors.toSet()))
                             .build());
+                } else {
+                    update(p);
                 }
-                
-                p.update();
             }
         });
     }

@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import lombok.NonNull;
 import processing.zgg.sketch.rss.RideableShareSystem;
-import processing.zgg.sketch.rss.gbfs.GbfsStationInfoMapper;
-import processing.zgg.sketch.rss.gbfs.GbfsStationStatusMapper;
 import processing.zgg.sketch.rss.gbfs.data.GbfsStationInfo;
 import processing.zgg.sketch.rss.gbfs.data.GbfsStationStatus;
 import processing.zgg.utils.ResourceUtils;
@@ -53,7 +52,9 @@ public class GbfsRideableShareSystemBuilder implements RideableShareSystemBuilde
             for (JsonNode curNode : stationInfoStationsJsonNode) {
                 final GbfsStationInfo gbfsStationInfo = gbfsStationInfoMapper
                         .map(curNode.toString());
-                gbfsStationInfoList.add(gbfsStationInfo);
+                if (isStationInfoValid(gbfsStationInfo)) {
+                    gbfsStationInfoList.add(gbfsStationInfo);
+                }
             }
         }
         
@@ -76,6 +77,19 @@ public class GbfsRideableShareSystemBuilder implements RideableShareSystemBuilde
         bikeShareSystem.initFromGbfs(gbfsStationInfoList, gbfsStationStatusList);
         
         return bikeShareSystem;
+    }
+    
+    /**
+     * Tests if the station can handle at least one rideable and is not located
+     * on <a href="https://en.wikipedia.org/wiki/Null_Island">Null Island</a>.
+     * 
+     * @param stationInfo
+     * @return true if the station info is valid
+     */
+    private boolean isStationInfoValid(@NonNull final GbfsStationInfo stationInfo) {
+        return Optional.ofNullable(stationInfo.getCapacity()).orElse(0) > 0
+                && (Optional.ofNullable(stationInfo.getLatitude()).orElse(0d) > 0
+                || Optional.ofNullable(stationInfo.getLongitude()).orElse(0d) > 0);
     }
     
     private RideableShareSystem buildDummy(@NonNull final String name) {

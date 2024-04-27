@@ -25,7 +25,14 @@ import processing.zgg.sketch.rss.gbfs.GbfsRideableShareSystemBuilder;
 import processing.zgg.sketch.rss.event.RideableShareSystemEventType;
 
 /**
- *
+ * Rideable Share System sketch using real-time data provided by shared
+ * mobility systems compatible with General Bikeshare Feed Specification (GBFS).
+ * 
+ * @param GBFS host key
+ * 
+ * @see <a href="src/main/resources/gbfs_hosts.properties">gbfs_hosts.properties</a>
+ * @see <a href="https://github.com/MobilityData/gbfs">GBFS</a>
+ * 
  * @author gestorum
  */
 public class RSSSketch extends ZenGardenSketch
@@ -323,13 +330,6 @@ public class RSSSketch extends ZenGardenSketch
         
         stroke(rideableColor.getRGB());
         strokeWeight(rideableWidth);
-//        translate(rideablePosition.x, rideablePosition.y);
-//        rotate(rideableParticle.getVelocity().heading());
-//        beginShape();
-//        vertex(rideableParticle.getRadius(), 0);
-//        vertex(-rideableParticle.getRadius(), -rideableParticle.getRadius());
-//        vertex(-rideableParticle.getRadius(), rideableParticle.getRadius());
-//        endShape(CLOSE);
         point(rideablePosition.x, rideablePosition.y);
         pop();
         

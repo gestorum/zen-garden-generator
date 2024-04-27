@@ -22,8 +22,6 @@ public class TwoDMotionSketch extends ZenGardenSketch {
     private static final int NUM_FRAMES = FRAME_RATE * 4;
     private static final int NUM_SAMPLES = 12;
     private static final float R = 100;
-    
-    private static final float motion_radius = 0.5f;
 
     private float t;
     private boolean counterClockwise;
@@ -70,18 +68,6 @@ public class TwoDMotionSketch extends ZenGardenSketch {
             strokeWeight(strokeWeight);
             point((float) p.getX(), (float) p.getY());
         });
-        /*
-        line((float) samplePoint1.getX(), (float) samplePoint1.getY(),
-                (float) samplePoint2.getX(), (float) samplePoint2.getY());
-        
-        final float ease = MotionUtils.ease(t, 8);
-        final float x = lerp((float) samplePoint1.getX(), (float) samplePoint2.getX(), ease);
-        final float y = lerp((float) samplePoint1.getY(), (float) samplePoint2.getY(), ease);
-        
-        stroke(Color.RED.getRGB());
-        strokeWeight(12f);
-        point(x, y);
-*/
         
         if (frameCount % NUM_FRAMES == 0) {
             counterClockwise = !counterClockwise;

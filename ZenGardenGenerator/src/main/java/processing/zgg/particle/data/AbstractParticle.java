@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import processing.core.PVector;
+import processing.zgg.data.IdentifiedEntry;
 import processing.zgg.utils.MotionUtils;
 
 /**
@@ -13,7 +14,7 @@ import processing.zgg.utils.MotionUtils;
  */
 @Data
 @SuperBuilder
-public abstract class AbstractParticle {
+public abstract class AbstractParticle implements IdentifiedEntry {
     
     private PVector position;
     private PVector velocity;
