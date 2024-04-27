@@ -25,6 +25,7 @@ https://github.com/benfry/processing4
 
 https://github.com/philburk/jsyn
 
-![bixi2024-04-27_loop](https://github.com/gestorum/zen-garden-generator/assets/96925948/12773b5d-7626-4d0f-bce4-59a26720e565)
+![bixi2024-04-27_loop](https://github.com/gestorum/zen-garden-generator/assets/96925948/7547cb51-46cf-42d4-8f5e-1026ae78d67f)
+Rideable Share System - BIXI Montreal
 
 https://natureofcode.com is my main source of inspiration for this project.
