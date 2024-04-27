@@ -1,10 +1,15 @@
 # zen-garden-generator
 
-Use ZenGardenGenerator main class to launch Processing 2D & 3D sketches (PApplet).
+This project aims to easily create 2D & 3D animated environments with or without sound effects.
+
+Use ZenGardenGenerator main class to launch Processing sketches (PApplet).
 
 ZenGardenGenerator [SketchClassName] [SketchArguments]
 
-Particle system with event handling & basic collision management. Everything is already in place to easily capture snapshots [c], pause [p] and record [r] your animations.
+Main features:
+1) Particle system with event handling & basic collision management.
+2) Built-in shorcuts to capture snapshots [c], pause [p] and record [r] your animations.
+3) Use built-in instruments or create your own to generate sounds.
 
 Dependencies:
 
