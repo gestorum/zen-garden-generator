@@ -2,14 +2,18 @@
 
 This project aims to easily create 2D & 3D animated environments with or without sound effects.
 
-Use ZenGardenGenerator main class to launch Processing sketches (PApplet).
-
-ZenGardenGenerator [SketchClassName] [SketchArguments]
-
 Main features:
 1) Particle system with event handling & basic collision management.
 2) Built-in shorcuts to capture snapshots [c], pause [p] and record [r] your animations.
 3) Use built-in instruments or create your own to generate sounds.
+
+Use ZenGardenGenerator main class to launch Processing sketches (PApplet).
+
+ZenGardenGenerator [SketchClassName] [SketchArguments]
+
+Built-in Sketches:
+1) RSSSketch: Rideable Share System simulation using real-time data from GBFS (https://github.com/MobilityData/gbfs) compatible servers.
+2) A few 2D & 3D sketches in the tuto package.
 
 Dependencies:
 
