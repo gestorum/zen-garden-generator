@@ -1,6 +1,5 @@
 package processing.zgg.data;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,7 @@ import processing.zgg.data.KdTree.Node;
  * 
  * @author gestorum
  */
-public abstract class KdTree<V extends IdentifiedEntry> {
+public abstract class KdTree<V extends Identified> {
 
     private int k;
     private Node root;
@@ -59,6 +58,11 @@ public abstract class KdTree<V extends IdentifiedEntry> {
     }
     
     public Node insert(final V value) {
+        final Node existingNode = search(value);
+        if (existingNode != null) {
+            return existingNode;
+        }
+        
         return insertRec(this.root, value, 0);
     }
     
@@ -72,9 +76,9 @@ public abstract class KdTree<V extends IdentifiedEntry> {
             return insert(value);
         }
         
-        deleteRec(valueTreeNode, valueTreeNode.getValue(), 0);
+        valueTreeNode.setValue(value);
         
-        return insert(value);
+        return valueTreeNode;
     }
     
     public List<V> findNearestNeighbors(@NonNull final V value,
@@ -100,29 +104,11 @@ public abstract class KdTree<V extends IdentifiedEntry> {
         return this.lastNearestNeighbor != null ? Collections.singletonList(this.lastNearestNeighbor.getValue())
                 : Collections.emptyList();
     }
-    
-    public List<Node> getAllNodes() {
-        final List<Node> allNodes = new ArrayList<>();
-        
-        treeNodesToListRec(this.root, allNodes);
-        
-        return allNodes;
-    }
-    
-    public List<V> getAllValues() {
-        return getAllNodes().stream().map(Node::getValue).toList();
-    }
-    
-    private void treeNodesToListRec(final Node node, final List<Node> list){
-        if (node == null){
-            return;
-        }
-        
-        treeNodesToListRec(node.getLeft(), list);
-        list.add(node);
-        treeNodesToListRec(node.getRight(), list);
-    }
 
+    public int size() {
+        return nodeByValueId.size();
+    }
+    
     private Node insertRec(final Node current, final V value, final int depth) {
         if (current == null) {
             final Node newNode = newNode(value);
@@ -157,7 +143,7 @@ public abstract class KdTree<V extends IdentifiedEntry> {
             throw new RuntimeException("Tree node has no value!");
         }
         
-        int cd = depth % 3;
+        int cd = depth % k;
         final float[] nodeValuePoint = getPointFromValue(nodeValue);
         final float[] valuePoint = getPointFromValue(value);
         if (valuePoint[cd] < nodeValuePoint[cd]) {
@@ -179,7 +165,9 @@ public abstract class KdTree<V extends IdentifiedEntry> {
             node.setRight(deleteRec(node.getRight(), nodeValue, depth + 1));
         }
         
-        nodeByValueId.remove(nodeValue.getId());
+        if (depth == 0) {
+            nodeByValueId.remove(value.getId());
+        }
         
         return node;
     }

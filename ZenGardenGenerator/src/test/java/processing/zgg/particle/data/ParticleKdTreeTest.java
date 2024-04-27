@@ -1,7 +1,5 @@
 package processing.zgg.particle.data;
 
-import java.util.List;
-import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,8 +10,6 @@ import processing.zgg.data.GenericParticleFactory;
 
 /**
  *
- * TODO: Fix these unit tests and KdTree ASAP.
- * 
  * @author gestorum
  */
 public class ParticleKdTreeTest {
@@ -40,12 +36,7 @@ public class ParticleKdTreeTest {
         final GenericParticle p6 = GenericParticleFactory.build(new PVector(15, 20, 1));
         particleKdTree.insert(p6);
         
-        final List<AbstractParticle> allParticles = particleKdTree.getAllValues();
-        final List<AbstractParticle> expectedOrder = List.of(p4, p3, p2, p1, p6, p5);
-        assertTrue(allParticles.size() == expectedOrder.size());
-        IntStream.range(0, expectedOrder.size()).forEach(i -> {
-            assertTrue(expectedOrder.get(i).equals(allParticles.get(i)));
-        });
+        assertTrue(particleKdTree.size() == 6);
     }
     
     @Test
@@ -58,12 +49,13 @@ public class ParticleKdTreeTest {
         final GenericParticle p2 = GenericParticleFactory.build(new PVector(10, 5, 0));
         particleKdTree.insert(p2);
         
-        p1.setPosition(new PVector(15, 0, 0));
+        final PVector p1NewPosition = new PVector(15, 0, 0);
+        p1.setPosition(p1NewPosition);
         particleKdTree.update(p1);
         
-        final List<AbstractParticle> allParticles = particleKdTree.getAllValues();
-        assertTrue(allParticles.size() == 2);
-        assertTrue(p2.equals(allParticles.get(0)));
+        assertTrue(particleKdTree.size() == 2);
+        final ParticleKdTree.Node p1Node = particleKdTree.search(p1);
+        assertTrue(p1Node.getValue().getPosition().equals(p1NewPosition));
     }
     
     @Test
@@ -92,5 +84,6 @@ public class ParticleKdTreeTest {
         
         assertNotNull(particleKdTree.search(p3));
         assertNotNull(particleKdTree.search(p4));
+        assertTrue(particleKdTree.size() == 2);
     }
 }

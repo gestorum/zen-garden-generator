@@ -4,7 +4,7 @@ package processing.zgg.data;
  *
  * @author gestorum
  */
-public interface IdentifiedEntry {
+public interface Identified {
     
     String getId();
 }
