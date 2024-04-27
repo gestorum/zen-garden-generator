@@ -7,14 +7,18 @@ package processing.zgg.particle.data;
 import java.util.Optional;
 import lombok.NonNull;
 import processing.core.PVector;
-import processing.zgg.data.BinaryTree;
+import processing.zgg.data.KdTree;
 
 /**
- * Binary tree implementation for abstract particles.
+ * K-d tree implementation for abstract particles.
  * 
  * @author gestorum
  */
-public class ParticleTree extends BinaryTree<AbstractParticle> {
+public class ParticleKdTree extends KdTree<AbstractParticle> {
+    
+    public ParticleKdTree() {
+        super(3);
+    }
     
     @Override
     protected float[] getPointFromValue(@NonNull AbstractParticle value) {

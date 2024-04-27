@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.NonNull;
 import processing.zgg.particle.data.AbstractParticle;
-import processing.zgg.particle.data.ParticleTree;
+import processing.zgg.particle.data.ParticleKdTree;
 import processing.zgg.particle.event.ParticleSystemEvent;
 import processing.zgg.particle.event.ParticleSystemEventListener;
 
@@ -16,6 +16,8 @@ import processing.zgg.particle.event.ParticleSystemEventListener;
  */
 public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     
+    private static final int MAX_NEIGHBORS = 1;
+    
     protected T system;
     protected int width;
     protected int height;
@@ -24,7 +26,7 @@ public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     private int speedUpFactor;
     
     private Set<ParticleSystemEventListener> eventListeners = new HashSet<>();
-    private ParticleTree particleTree;
+    private ParticleKdTree particleTree;
 
     public AbstractParticleSystem(final T system) {
         this.system = system;
@@ -32,7 +34,7 @@ public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     
     @Override
     public void init(final int width, final int height, final int depth) {
-        this.particleTree = new ParticleTree();
+        this.particleTree = new ParticleKdTree();
     }
     
     @Override
@@ -79,6 +81,6 @@ public abstract class AbstractParticleSystem<T> implements ParticleSystem<T> {
     }
     
     private List<? extends AbstractParticle> findNearestNeighbors(@NonNull AbstractParticle particle) {
-        return particleTree.findNearestNeighbors(particle);
+        return particleTree.findNearestNeighbors(particle, MAX_NEIGHBORS);
     }
 }
