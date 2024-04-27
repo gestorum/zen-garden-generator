@@ -25,6 +25,6 @@ https://github.com/benfry/processing4
 
 https://github.com/philburk/jsyn
 
-![citibike](https://github.com/gestorum/zen-garden-generator/assets/96925948/3706a863-f45f-41aa-871f-3ab776e1547f)
+![bixi2024-04-27](https://github.com/gestorum/zen-garden-generator/assets/96925948/a1f5112f-f0cd-433d-bdd4-d477a8e7c890)
 
 https://natureofcode.com is my main source of inspiration for this project.
