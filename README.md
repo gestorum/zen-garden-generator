@@ -11,6 +11,6 @@ Dependencies:
 https://github.com/benfry/processing4
 https://github.com/philburk/jsyn
 
-My main source of inspiration for particle systems and animated stuff: https://natureofcode.com
-
 ![citibike](https://github.com/gestorum/zen-garden-generator/assets/96925948/3706a863-f45f-41aa-871f-3ab776e1547f)
+
+My main source of inspiration for particle systems and animated stuff: https://natureofcode.com
