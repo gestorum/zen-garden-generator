@@ -12,7 +12,7 @@ Use ZenGardenGenerator main class to launch Processing sketches (i.e. PApplet).
 ZenGardenGenerator [SketchClassName] [SketchArguments]
 
 Built-in Sketches:
-1) RSSSketch: Rideable Share System simulation using real-time data from GBFS (https://github.com/MobilityData/gbfs) compatible servers. E.g. ZenGardenGenerator RSSSketch bixi. See gbfs_hosts.properties.
+1) RSSSketch: Rideable Share System simulation using real-time data from GBFS (https://github.com/MobilityData/gbfs) compatible servers. E.g. ZenGardenGenerator RSSSketch bixi. See resources/gbfs_hosts.properties.
 2) A few 2D & 3D sketches in the tuto package. E.g. ZenGardenGenerator SphereCollisionSketch.
 
 Dependencies:
