@@ -1,6 +1,10 @@
 # zen-garden-generator
 
-Use ZenGardenGenerator main class to launch Processing sketches (PApplet). Particle system with event handling & basic collision management. Everything is already in place to easily pause, capture and record your animations.
+Use ZenGardenGenerator main class to launch Processing 2D & 3D sketches (PApplet).
+
+ZenGardenGenerator [SketchClassName] [SketchArguments]
+
+Particle system with event handling & basic collision management. Everything is already in place to easily capture snapshots [c], pause [p] and record [r] your animations.
 
 https://processing.org
 
