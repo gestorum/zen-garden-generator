@@ -20,9 +20,13 @@ public abstract class KdTree<V extends Identified> {
     private int k;
     private Node root;
     private Map<String, Node> nodeByValueId = new HashMap<>();
-    private Node lastNearestNeighbor;
-    private float bestDistance;
 
+    @Data
+    private class NearestNeighborResult {
+        private Node nearestNeighbor;
+        private float bestDistance;
+    }
+    
     @Data
     public class Node {
         private V value;
@@ -76,13 +80,12 @@ public abstract class KdTree<V extends Identified> {
             return insert(value);
         }
         
-        valueTreeNode.setValue(value);
+        deleteRec(valueTreeNode, valueTreeNode.getValue(), 0);
         
-        return valueTreeNode;
+        return insert(value);
     }
     
-    public List<V> findNearestNeighbors(@NonNull final V value,
-            final int maxNeighbors) {
+    public List<V> findNearestNeighbors(@NonNull final V value, final int maxNeighbors) {
         if (this.root == null || maxNeighbors <= 0) {
             return Collections.emptyList();
         }
@@ -97,11 +100,10 @@ public abstract class KdTree<V extends Identified> {
             return Collections.emptyList();
         }
         
-        this.lastNearestNeighbor = null;
-        this.bestDistance = 0;
-        nearestRec(this.root, valueTreeNode, 0);
+        final NearestNeighborResult result = new NearestNeighborResult();
+        nearestRec(this.root, valueTreeNode, 0, result);
         
-        return this.lastNearestNeighbor != null ? Collections.singletonList(this.lastNearestNeighbor.getValue())
+        return result.getNearestNeighbor() != null ? Collections.singletonList(result.getNearestNeighbor().getValue())
                 : Collections.emptyList();
     }
 
@@ -172,21 +174,24 @@ public abstract class KdTree<V extends Identified> {
         return node;
     }
     
-    private void nearestRec(final Node current, @NonNull final Node target, int depth) {
+    private void nearestRec(final Node current, @NonNull final Node target,
+            int depth, final NearestNeighborResult result) {
         if (current == null) {
             return;
         }
         
         final float d = current.distance(target);
-        if (this.lastNearestNeighbor == null || d < this.bestDistance) {
+        final Node nearestNeighbor = result.getNearestNeighbor();
+        if (nearestNeighbor == null || d < result.getBestDistance()) {
             final boolean isItself = current.getValue().getId().equals(target.getValue().getId());
             if (!isItself) {
-                this.bestDistance = d;
-                this.lastNearestNeighbor = current;
+                result.setNearestNeighbor(current);
+                result.setBestDistance(d);
             }
         }
         
-        if (this.bestDistance == 0) {
+        // No needs to look further since we found the perfect match
+        if (result.getBestDistance() == 0) {
             return;
         }
         
@@ -195,13 +200,15 @@ public abstract class KdTree<V extends Identified> {
         final double dx = curPoint[depth] - targetPoint[depth];
         
         depth = (depth + 1) % k;
-        nearestRec(dx > 0 ? current.getLeft() : current.getRight(), target, depth);
+        nearestRec(dx > 0 ? current.getLeft() : current.getRight(), target,
+                depth, result);
         
-        if (dx * dx >= this.bestDistance) {
+        if (dx * dx >= result.getBestDistance()) {
             return;
         }
         
-        nearestRec(dx > 0 ? current.getRight() : current.getLeft(), target, depth);
+        nearestRec(dx > 0 ? current.getRight() : current.getLeft(), target,
+                depth, result);
     }
 
     private V minValue(@NonNull Node node) {
